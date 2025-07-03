@@ -15,4 +15,4 @@ public:
 
 private:
     Ui::MainWindow *ui;
-}
+};
