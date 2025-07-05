@@ -1,4 +1,4 @@
-#include <QObject>
+#include <QtCore/QObject>
 
 QT_BEGIN_NAMESPACE
 namespace Events {

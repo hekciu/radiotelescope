@@ -8,7 +8,6 @@ main: main.cpp mainwindow.h mainwindow_ui.h mainwindow.cpp # mainwindow.ui
 	mainwindow.cpp moc_mainwindow.cpp \
 	event_handler.cpp moc_event_handler.cpp \
 	-I /usr/include/x86_64-linux-gnu/qt6 \
-	-I /usr/include/x86_64-linux-gnu/qt6/QtWidgets \
-	-I /usr/include/x86_64-linux-gnu/qt6/QtCore \
-	-lQt6Widgets -lQt6Core -lQt6Gui \
+	-lQt6Widgets -lQt6Core -lQt6Gui -lQt6SerialPort \
 	-o radiotelescope
+	rm ./moc_*
