@@ -23,6 +23,8 @@
 
 /* USER CODE BEGIN INCLUDE */
 
+#include "main.h"
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -261,15 +263,12 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
-  if (Buf[0] == 97) {
-
-	  HAL_GPIO_TogglePin(GPIOB, 5);
-
-	  CDC_Transmit_FS("dupa\r\n\0", 7);
-  }
+	for (uint32_t i = 0; i < *Len; i++) {
+	   Handle_Input_Command(*(Buf + i));
+	}
 
   return (USBD_OK);
   /* USER CODE END 6 */

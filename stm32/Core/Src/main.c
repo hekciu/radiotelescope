@@ -51,6 +51,14 @@ COM_InitTypeDef BspCOMInit;
 
 static int8_t cur_motor_step = 8;
 
+enum COMMAND {
+   M1_RIGHT = 97,
+   M1_LEFT = 98,
+   M2_RIGHT = 99,
+   M2_LEFT = 100
+};
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,39 +72,71 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void Motor_Step(bool reverse) {
+static void Motor_Full_Step_1(bool reverse) {
 	switch (cur_motor_step) {
 	case 0:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
 		break;
 	case 1:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
 		break;
 	case 2:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
 		break;
 	case 3:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
+		break;
+	}
+
+	if (reverse) {
+		cur_motor_step--;
+	} else {
+		cur_motor_step++;
+	}
+
+	if (cur_motor_step > 3) cur_motor_step = 0;
+
+	if (cur_motor_step < 0) cur_motor_step = 3;
+};
+
+
+static void Motor_Half_Step_1(bool reverse) {
+	switch (cur_motor_step) {
+	case 0:
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+		break;
+	case 1:
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
+		break;
+	case 2:
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+		break;
+	case 3:
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
 		break;
 	case 4:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
 		break;
 	case 5:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
 		break;
 	case 6:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
 		break;
 	case 7:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
 		break;
 	}
 
@@ -109,6 +149,44 @@ static void Motor_Step(bool reverse) {
 	if (cur_motor_step > 7) cur_motor_step = 0;
 
 	if (cur_motor_step < 0) cur_motor_step = 7;
+};
+
+
+void Handle_Input_Command(uint8_t command) {
+       uint8_t m1_r_text[] = "motor 1 step right\n";
+       uint8_t m1_l_text[] = "motor 1 step left\n";
+       uint8_t m2_r_text[] = "motor 2 step right\n";
+       uint8_t m2_l_text[] = "motor 2 step left\n";
+
+       uint8_t unknown_command_text[] = "unknown command\n";
+
+       switch(command) {
+       case M1_RIGHT:
+               CDC_Transmit_FS(m1_r_text, sizeof(m1_r_text));
+               Motor_Full_Step_1(false);
+               HAL_GPIO_TogglePin(GPIOB, 5);
+               break;
+
+       case M1_LEFT:
+               CDC_Transmit_FS(m1_l_text, sizeof(m1_l_text));
+               Motor_Full_Step_1(true);
+               HAL_GPIO_TogglePin(GPIOB, 5);
+               break;
+
+       case M2_RIGHT:
+               CDC_Transmit_FS(m2_r_text, sizeof(m2_r_text));
+               // HAL_GPIO_TogglePin(GPIOB, 5);
+               break;
+
+       case M2_LEFT:
+               CDC_Transmit_FS(m2_l_text, sizeof(m2_l_text));
+               // HAL_GPIO_TogglePin(GPIOB, 5);
+               break;
+
+       default:
+               CDC_Transmit_FS(unknown_command_text, sizeof(unknown_command_text));
+               break;
+       }
 }
 
 
@@ -132,7 +210,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-  Motor_Step(true);
+  // Motor_Step(true);
 
   /* USER CODE END Init */
 
