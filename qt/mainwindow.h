@@ -15,4 +15,5 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void setUsbWorker();
 };

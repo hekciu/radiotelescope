@@ -5,22 +5,28 @@
 
 QT_BEGIN_NAMESPACE
 
-Events::EventHandler::EventHandler(QObject * parent)
+Radiotelescope::EventHandler::EventHandler(QObject * parent)
     : QObject(parent) {
 };
 
-Events::EventHandler::~EventHandler() {};
+Radiotelescope::EventHandler::~EventHandler() {};
 
-void Events::EventHandler::on_btn1_clicked() {
+
+void Radiotelescope::EventHandler::onBtn1Clicked() {
+    sendData("a");
+};
+
+
+void Radiotelescope::EventHandler::sendData(const QString & request) {
     const QString TMP_NAME = "/dev/ttyACM0";
+
+    const QByteArray requestData = request.toUtf8();
 
     qInfo() << "buton 1 clicked";
     QSerialPort serial;
 
     serial.close();
     serial.setPortName(TMP_NAME);
-
-    const QByteArray requestData = "a";
 
     if (!serial.open(QIODevice::ReadWrite)) {
         qWarning() << "could not open serial port";
@@ -44,6 +50,6 @@ void Events::EventHandler::on_btn1_clicked() {
     }
 
     serial.close();
-};
+}
 
 QT_END_NAMESPACE

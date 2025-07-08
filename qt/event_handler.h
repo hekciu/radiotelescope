@@ -1,17 +1,21 @@
 #include <QtCore/QObject>
 
 QT_BEGIN_NAMESPACE
-namespace Events {
+namespace Radiotelescope {
 class EventHandler;
 }
 QT_END_NAMESPACE
 
-class Events::EventHandler : public QObject {
+class Radiotelescope::EventHandler : public QObject {
     Q_OBJECT
 
 public:
-    EventHandler(QObject * parent = nullptr);
+    explicit EventHandler(QObject * parent = nullptr);
     ~EventHandler();
+
 public slots:
-    void on_btn1_clicked();
+    void onBtn1Clicked();
+
+private:
+    void sendData(const QString &);
 };

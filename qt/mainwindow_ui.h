@@ -21,7 +21,7 @@ class MainWindow_Ui
 {
 public:
     QPushButton * pushButton;
-    Events::EventHandler * eventHandler;
+    Radiotelescope::EventHandler * eventHandler;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -32,13 +32,13 @@ public:
         pushButton = new QPushButton("click me!", MainWindow);
         //pushButton->setObjectName("pushButton");
 
-        eventHandler = new Events::EventHandler(MainWindow);
+        eventHandler = new Radiotelescope::EventHandler(MainWindow);
 
         QObject::connect(
             pushButton,
             &QPushButton::clicked,
             eventHandler,
-            &Events::EventHandler::on_btn1_clicked
+            &Radiotelescope::EventHandler::onBtn1Clicked
         );
 
         // MainWindow->setCentralWidget(pushButton);
