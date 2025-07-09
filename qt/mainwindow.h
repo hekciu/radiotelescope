@@ -1,4 +1,9 @@
 #include <QtWidgets/QMainWindow>
+#include <QtCore/QThread>
+
+#include "usb_worker.h"
+#include "event_handler.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,4 +21,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void setUsbWorker();
+    QThread * usbThread;
+    Radiotelescope::UsbWorker * usbWorker;
+    Radiotelescope::EventHandler * eventHandler;
 };

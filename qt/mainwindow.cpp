@@ -19,19 +19,30 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::setUsbWorker() {
-    qInfo() << "setting up usb worker";
+    qInfo() << "setting up";
 
-    QThread * usbThread = new QThread();
+    eventHandler = new Radiotelescope::EventHandler(this);
 
-    Radiotelescope::UsbWorker * usbWorker = new Radiotelescope::UsbWorker();
+    usbThread = new QThread(this);
 
-    usbWorker->moveToThread(usbThread);
+    usbWorker = new Radiotelescope::UsbWorker();
 
-    usbThread->start();
+    QObject::connect(
+        ui->pushButton,
+        &QPushButton::clicked,
+        eventHandler,
+        &Radiotelescope::EventHandler::onBtn1Clicked
+    );
+
     QObject::connect(
         usbThread,
         &QThread::started,
         usbWorker,
         &Radiotelescope::UsbWorker::process
     );
+
+
+    usbWorker->moveToThread(usbThread);
+
+    usbThread->start();
 }

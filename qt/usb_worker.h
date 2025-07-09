@@ -1,6 +1,10 @@
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #include <stdint.h>
+
+#ifndef USB_WORKER_H
+#define USB_WORKER_H
 
 QT_BEGIN_NAMESPACE
 namespace Radiotelescope {
@@ -13,7 +17,7 @@ class Radiotelescope::UsbWorker : public QObject {
     Q_OBJECT
 
 public:
-    UsbWorker();
+    explicit UsbWorker(QObject * parent = nullptr);
     ~UsbWorker();
 
     // https://doc.qt.io/qt-6/qtserialport-blockingsender-example.html
@@ -21,9 +25,19 @@ public:
 
 public slots:
     void process();
+    void sendData(const char * data, const uint32_t n);
+
+signals:
+    void connectionSuccess();
+    void connectionFailure();
 
 private:
     static const uint32_t BFR_CAPACITY = 50000;
-    uint8_t m_bfr[BFR_CAPACITY];
-    uint32_t m_bfr_size = 0;
+    static const uint32_t WAIT_TIMEOUT_MS = 30000;
+    QMutex * m_mutex;
+    uint32_t m_dataSize = 0;
+    char m_bfr[BFR_CAPACITY];
 };
+
+
+#endif
