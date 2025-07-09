@@ -17,14 +17,15 @@ public:
     ~EventHandler();
 
 public slots:
-    void onUsbThreadStarted();
+    void onUsbConnected();
+    void onUsbDisconnected();
     void onBtn1Clicked();
 
 signals:
     void sendData(const char * data, const uint32_t n);
 
 private:
-    bool usbThreadStarted = false;
+    bool usbConnected = false;
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
+#include <QtSerialPort/QSerialPort>
 
 #include <stdint.h>
 
@@ -17,7 +18,7 @@ class Radiotelescope::UsbWorker : public QObject {
     Q_OBJECT
 
 public:
-    explicit UsbWorker(QObject * parent = nullptr);
+    UsbWorker();
     ~UsbWorker();
 
     // https://doc.qt.io/qt-6/qtserialport-blockingsender-example.html
@@ -37,6 +38,8 @@ private:
     QMutex * m_mutex;
     uint32_t m_dataSize = 0;
     char m_bfr[BFR_CAPACITY];
+    bool success = false;
+    QSerialPort * serial;
 };
 
 

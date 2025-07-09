@@ -3,21 +3,25 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
+#include <QtCore/QTimer>
 #include <QtSerialPort/QSerialPort>
 
 
-Radiotelescope::UsbWorker::UsbWorker(QObject * parent)
-    : QObject (parent) {
+Radiotelescope::UsbWorker::UsbWorker() {
     m_mutex = new QMutex();
+    serial = new QSerialPort(); // without this it is created in a wrong thread??
 };
 
 
 Radiotelescope::UsbWorker::~UsbWorker() {
     delete m_mutex;
+    delete serial;
 };
 
 
 void Radiotelescope::UsbWorker::sendData(const char * data, const uint32_t n) {
+    qDebug() << "got data: " << data;
+
     m_mutex->lock();
 
     if (m_dataSize + n > BFR_CAPACITY) {
@@ -34,23 +38,21 @@ void Radiotelescope::UsbWorker::sendData(const char * data, const uint32_t n) {
 void Radiotelescope::UsbWorker::process() {
     qInfo() << "starting processing usb commands";
 
+    success = false;
+
     const QString TMP_NAME = "/dev/ttyACM0";
 
-    QSerialPort serial;
+    serial->setPortName(TMP_NAME);
 
-    bool success = false;
-
-    serial.setPortName(TMP_NAME);
-
-    while (true) {
-        QThread::msleep(50);
+    QTimer * timer = new QTimer();
+    QThread::connect(timer, &QTimer::timeout, [this]() {
 
         if (!success) {
-            serial.close();
-            success = serial.open(QIODevice::ReadWrite);
+            serial->close();
+            success = serial->open(QIODevice::ReadWrite);
 
             if (success) {
-                qInfo() << "successfully opened serial port";
+                // qInfo() << "successfully opened serial port";
                 emit connectionSuccess();
             } else {
                 qWarning() << "could not open serial port";
@@ -68,24 +70,31 @@ void Radiotelescope::UsbWorker::process() {
             m_mutex->unlock();
 
             if (requestData.length() == 0) {
-                continue;
+                return;
             }
 
-            serial.write(requestData);
+            qDebug() << "writing data: " << requestData;
 
-            if (!serial.waitForBytesWritten(WAIT_TIMEOUT_MS)) {
+            serial->write(requestData);
+
+            if (!serial->waitForBytesWritten(WAIT_TIMEOUT_MS)) {
                 success = false;
                 emit connectionFailure();
             } else {
-                if (serial.waitForReadyRead(300)) {
-                    QByteArray responseData = serial.readAll();
-                        while (serial.waitForReadyRead(10)) {
-                            responseData += serial.readAll();
+                if (serial->waitForReadyRead(300)) {
+                    QByteArray responseData = serial->readAll();
+                        while (serial->waitForReadyRead(10)) {
+                            responseData += serial->readAll();
                         }
+
+                        qDebug() << responseData;
                 }
             }
         }
-    }
 
-    serial.close();
+    });
+
+    timer->start(1000);
+
+    serial->close();
 };

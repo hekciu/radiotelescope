@@ -41,6 +41,26 @@ void MainWindow::setUsbWorker() {
         &Radiotelescope::UsbWorker::process
     );
 
+    QObject::connect(
+        eventHandler,
+        &Radiotelescope::EventHandler::sendData,
+        usbWorker,
+        &Radiotelescope::UsbWorker::sendData
+    );
+
+    QObject::connect(
+        usbWorker,
+        &Radiotelescope::UsbWorker::connectionSuccess,
+        eventHandler,
+        &Radiotelescope::EventHandler::onUsbConnected
+    );
+
+    QObject::connect(
+        usbWorker,
+        &Radiotelescope::UsbWorker::connectionFailure,
+        eventHandler,
+        &Radiotelescope::EventHandler::onUsbDisconnected
+    );
 
     usbWorker->moveToThread(usbThread);
 
