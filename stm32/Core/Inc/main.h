@@ -57,6 +57,8 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+void Handle_Input_Command(uint8_t command);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
