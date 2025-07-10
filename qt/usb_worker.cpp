@@ -8,14 +8,17 @@
 
 
 Radiotelescope::UsbWorker::UsbWorker() {
-    m_mutex = new QMutex();
-    serial = new QSerialPort(); // without this it is created in a wrong thread??
 };
 
 
 Radiotelescope::UsbWorker::~UsbWorker() {
-    delete m_mutex;
-    delete serial;
+    if (m_mutex != nullptr) {
+        delete m_mutex;
+    }
+
+    if (serial != nullptr) {
+        delete serial;
+    }
 };
 
 
@@ -37,6 +40,9 @@ void Radiotelescope::UsbWorker::sendData(const char * data, const uint32_t n) {
 
 void Radiotelescope::UsbWorker::process() {
     qInfo() << "starting processing usb commands";
+
+    m_mutex = new QMutex();
+    serial = new QSerialPort();
 
     success = false;
 
