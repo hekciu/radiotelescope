@@ -40,6 +40,11 @@ void Radiotelescope::UsbWorker::sendData(const QString data) {
 }
 
 
+void Radiotelescope::UsbWorker::onChangeUsbPortName(const QString portName) {
+    this->usbPortName = portName;
+};
+
+
 void Radiotelescope::UsbWorker::process() {
     qInfo() << "starting processing usb commands";
 
@@ -48,21 +53,21 @@ void Radiotelescope::UsbWorker::process() {
 
     success = false;
 
-    const QString TMP_NAME = "/dev/ttyACM0";
-
-    serial->setPortName(TMP_NAME);
-
     timer = new QTimer();
     QThread::connect(timer, &QTimer::timeout, [this]() {
         if (!success) {
             serial->close();
+
+            serial->setPortName(usbPortName);
+            //serial->setPortName("/dev/ttyACM0");
+
             success = serial->open(QIODevice::ReadWrite);
 
             if (success) {
                 // qInfo() << "successfully opened serial port";
                 emit usbAvailable();
             } else {
-                qWarning() << "could not open serial port";
+                qWarning() << "could not open serial port: " << usbPortName;
                 emit usbUnavailable();
             }
         }

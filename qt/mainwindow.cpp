@@ -123,6 +123,34 @@ void MainWindow::setUsbWorker() {
         &Radiotelescope::EventHandler::onUsbUnavailable
     );
 
+    /*
+        Port name
+    */
+
+    QObject::connect(
+        ui->savePortNameButton,
+        &QPushButton::clicked,
+        [this]() {
+            const QString portName = ui->portNameInput->text();
+
+            emit portNameChanged(portName);
+        }
+    );
+
+    QObject::connect(
+        this,
+        &MainWindow::MainWindow::portNameChanged,
+        eventHandler,
+        &Radiotelescope::EventHandler::onPortNameChanged
+    );
+
+    QObject::connect(
+        eventHandler,
+        &Radiotelescope::EventHandler::changeUsbPortName,
+        usbWorker,
+        &Radiotelescope::UsbWorker::onChangeUsbPortName
+    );
+
     usbWorker->moveToThread(usbThread);
 
     usbThread->start();

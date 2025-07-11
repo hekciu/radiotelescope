@@ -18,6 +18,9 @@ public:
     MainWindow(QWidget * parent = nullptr);
     ~MainWindow();
 
+signals:
+    void portNameChanged(const QString portName);
+
 private:
     Ui::MainWindow *ui;
     void setUsbWorker();

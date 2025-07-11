@@ -12,6 +12,7 @@ Using .ui files was abandoned for this project.
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QLineEdit>
 
 #include "event_handler.h"
 
@@ -24,6 +25,8 @@ public:
     QPushButton * m1RButton;
     QPushButton * m2LButton;
     QPushButton * m2RButton;
+    QLineEdit * portNameInput;
+    QPushButton * savePortNameButton;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -43,7 +46,12 @@ public:
 
         m2RButton = new QPushButton("m2r", MainWindow);
         m2RButton->setGeometry(60, 70, 60, 20);
-        //pushButton->setObjectName("pushButton");
+
+        portNameInput = new QLineEdit(MainWindow);
+        portNameInput->setGeometry(200, 50, 100, 20);
+
+        savePortNameButton = new QPushButton("Save port\nname", MainWindow);
+        savePortNameButton->setGeometry(320, 40, 70, 40);
 
         // MainWindow->setCentralWidget(pushButton);
 

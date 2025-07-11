@@ -32,13 +32,18 @@ public slots:
 
     void onMotorButtonReleased();
 
+    void onPortNameChanged(const QString);
+
 signals:
-    void sendData(const QString data);
+    void sendData(const QString);
+    void changeUsbPortName(const QString);
 
 private:
     bool usbWorkerAvailable = false;
-    QString commandToSend = NULL;
+    QString commandToSend = "";
     QTimer * timer;
+    QString portName = "";
+    QString lastPortName = "";
 };
 
 #endif

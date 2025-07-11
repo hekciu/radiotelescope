@@ -47,12 +47,22 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 };
 
 
+void Radiotelescope::EventHandler::onPortNameChanged(const QString newPortName) {
+    lastPortName = portName;
+    portName = newPortName;
+};
+
+
 void Radiotelescope::EventHandler::startUsbCommunication() {
     timer = new QTimer();
 
     QObject::connect(timer, &QTimer::timeout, [this]() {
+        if (portName != lastPortName) {
+            emit changeUsbPortName(portName);
+        }
+
         if (this->commandToSend.length() > 0) {
-            sendData(commandToSend);
+            emit sendData(commandToSend);
         };
     });
 

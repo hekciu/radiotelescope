@@ -27,13 +27,15 @@ public:
 
 public slots:
     void process();
-    void sendData(const QString data);
+    void sendData(const QString);
+    void onChangeUsbPortName(const QString);
 
 signals:
     void usbAvailable();
     void usbUnavailable();
 
 private:
+    QString usbPortName = "";
     static const uint32_t BFR_CAPACITY = 50000;
     static const uint32_t WAIT_TIMEOUT_MS = 30000;
     QMutex * m_mutex = nullptr;
