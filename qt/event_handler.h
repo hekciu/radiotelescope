@@ -1,4 +1,5 @@
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
@@ -15,17 +16,29 @@ class Radiotelescope::EventHandler : public QObject {
 public:
     explicit EventHandler(QObject * parent = nullptr);
     ~EventHandler();
+    void startUsbCommunication();
 
 public slots:
-    void onUsbConnected();
-    void onUsbDisconnected();
-    void onBtn1Clicked();
+    void onUsbAvailable();
+    void onUsbUnavailable();
+
+    void onM1LBtnPressed();
+
+    void onM1RBtnPressed();
+
+    void onM2LBtnPressed();
+
+    void onM2RBtnPressed();
+
+    void onMotorButtonReleased();
 
 signals:
-    void sendData(const char * data, const uint32_t n);
+    void sendData(const QString data);
 
 private:
-    bool usbConnected = false;
+    bool usbWorkerAvailable = false;
+    QString commandToSend = NULL;
+    QTimer * timer;
 };
 
 #endif

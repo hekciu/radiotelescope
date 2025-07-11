@@ -23,16 +23,77 @@ void MainWindow::setUsbWorker() {
 
     eventHandler = new Radiotelescope::EventHandler(this);
 
+    eventHandler->startUsbCommunication();
+
     usbThread = new QThread(this);
 
     usbWorker = new Radiotelescope::UsbWorker();
 
+    /*
+        Buttons
+    */
     QObject::connect(
-        ui->pushButton,
-        &QPushButton::clicked,
+        ui->m1LButton,
+        &QPushButton::pressed,
         eventHandler,
-        &Radiotelescope::EventHandler::onBtn1Clicked
+        &Radiotelescope::EventHandler::onM1LBtnPressed
     );
+
+    QObject::connect(
+        ui->m1LButton,
+        &QPushButton::released,
+        eventHandler,
+        &Radiotelescope::EventHandler::onMotorButtonReleased
+    );
+
+
+    QObject::connect(
+        ui->m1RButton,
+        &QPushButton::pressed,
+        eventHandler,
+        &Radiotelescope::EventHandler::onM1RBtnPressed
+    );
+
+    QObject::connect(
+        ui->m1RButton,
+        &QPushButton::released,
+        eventHandler,
+        &Radiotelescope::EventHandler::onMotorButtonReleased
+    );
+
+
+    QObject::connect(
+        ui->m2LButton,
+        &QPushButton::pressed,
+        eventHandler,
+        &Radiotelescope::EventHandler::onM2LBtnPressed
+    );
+
+    QObject::connect(
+        ui->m2LButton,
+        &QPushButton::released,
+        eventHandler,
+        &Radiotelescope::EventHandler::onMotorButtonReleased
+    );
+
+
+    QObject::connect(
+        ui->m2RButton,
+        &QPushButton::pressed,
+        eventHandler,
+        &Radiotelescope::EventHandler::onM2RBtnPressed
+    );
+
+    QObject::connect(
+        ui->m2RButton,
+        &QPushButton::released,
+        eventHandler,
+        &Radiotelescope::EventHandler::onMotorButtonReleased
+    );
+
+    /*
+        Threads and handlers
+    */
 
     QObject::connect(
         usbThread,
@@ -50,16 +111,16 @@ void MainWindow::setUsbWorker() {
 
     QObject::connect(
         usbWorker,
-        &Radiotelescope::UsbWorker::connectionSuccess,
+        &Radiotelescope::UsbWorker::usbAvailable,
         eventHandler,
-        &Radiotelescope::EventHandler::onUsbConnected
+        &Radiotelescope::EventHandler::onUsbAvailable
     );
 
     QObject::connect(
         usbWorker,
-        &Radiotelescope::UsbWorker::connectionFailure,
+        &Radiotelescope::UsbWorker::usbUnavailable,
         eventHandler,
-        &Radiotelescope::EventHandler::onUsbDisconnected
+        &Radiotelescope::EventHandler::onUsbUnavailable
     );
 
     usbWorker->moveToThread(usbThread);

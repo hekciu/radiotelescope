@@ -20,7 +20,10 @@ QT_BEGIN_NAMESPACE
 class MainWindow_Ui
 {
 public:
-    QPushButton * pushButton;
+    QPushButton * m1LButton;
+    QPushButton * m1RButton;
+    QPushButton * m2LButton;
+    QPushButton * m2RButton;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -29,12 +32,22 @@ public:
         }
         MainWindow->resize(800, 600);
 
-        pushButton = new QPushButton("click me!", MainWindow);
+        m1LButton = new QPushButton("m1l", MainWindow);
+        m1LButton->setGeometry(0, 50, 60, 20);
+
+        m1RButton = new QPushButton("m1r", MainWindow);
+        m1RButton->setGeometry(120, 50, 60, 20);
+
+        m2LButton = new QPushButton("m2l", MainWindow);
+        m2LButton->setGeometry(60, 30, 60, 20);
+
+        m2RButton = new QPushButton("m2r", MainWindow);
+        m2RButton->setGeometry(60, 70, 60, 20);
         //pushButton->setObjectName("pushButton");
 
         // MainWindow->setCentralWidget(pushButton);
 
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Hello Qt!", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Radio telescope control software", nullptr));
 
         // QMetaObject::connectSlotsByName(MainWindow);
     }

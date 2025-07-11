@@ -22,15 +22,17 @@ Radiotelescope::UsbWorker::~UsbWorker() {
 };
 
 
-void Radiotelescope::UsbWorker::sendData(const char * data, const uint32_t n) {
-    qDebug() << "got data: " << data;
+void Radiotelescope::UsbWorker::sendData(const QString data) {
+    uint32_t n = data.length();
+
+    qDebug() << "got data: " << data << "n: " << n;
 
     m_mutex->lock();
 
     if (m_dataSize + n > BFR_CAPACITY) {
         // handle error
     } else {
-        memcpy(m_bfr + m_dataSize, data, n);
+        memcpy(m_bfr + m_dataSize, data.data(), n);
         m_dataSize += n;
     }
 
@@ -50,19 +52,18 @@ void Radiotelescope::UsbWorker::process() {
 
     serial->setPortName(TMP_NAME);
 
-    QTimer * timer = new QTimer();
+    timer = new QTimer();
     QThread::connect(timer, &QTimer::timeout, [this]() {
-
         if (!success) {
             serial->close();
             success = serial->open(QIODevice::ReadWrite);
 
             if (success) {
                 // qInfo() << "successfully opened serial port";
-                emit connectionSuccess();
+                emit usbAvailable();
             } else {
                 qWarning() << "could not open serial port";
-                emit connectionFailure();
+                emit usbUnavailable();
             }
         }
 
@@ -79,14 +80,13 @@ void Radiotelescope::UsbWorker::process() {
                 return;
             }
 
-            qDebug() << "writing data: " << requestData;
-
             serial->write(requestData);
 
             if (!serial->waitForBytesWritten(WAIT_TIMEOUT_MS)) {
                 success = false;
-                emit connectionFailure();
+                emit usbUnavailable();
             } else {
+                /*
                 if (serial->waitForReadyRead(300)) {
                     QByteArray responseData = serial->readAll();
                         while (serial->waitForReadyRead(10)) {
@@ -95,12 +95,11 @@ void Radiotelescope::UsbWorker::process() {
 
                         qDebug() << responseData;
                 }
+                */
             }
         }
 
     });
 
-    timer->start(1000);
-
-    serial->close();
+    timer->start(100);
 };

@@ -1,5 +1,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
+#include <QtCore/QTimer>
 #include <QtSerialPort/QSerialPort>
 
 #include <stdint.h>
@@ -26,11 +27,11 @@ public:
 
 public slots:
     void process();
-    void sendData(const char * data, const uint32_t n);
+    void sendData(const QString data);
 
 signals:
-    void connectionSuccess();
-    void connectionFailure();
+    void usbAvailable();
+    void usbUnavailable();
 
 private:
     static const uint32_t BFR_CAPACITY = 50000;
@@ -40,6 +41,7 @@ private:
     char m_bfr[BFR_CAPACITY];
     bool success = false;
     QSerialPort * serial = nullptr;
+    QTimer * timer = nullptr;
 };
 
 
