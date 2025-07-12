@@ -25,8 +25,6 @@ Radiotelescope::UsbWorker::~UsbWorker() {
 void Radiotelescope::UsbWorker::sendData(const QString data) {
     uint32_t n = data.length();
 
-    qDebug() << "got data: " << data << "n: " << n;
-
     m_mutex->lock();
 
     if (m_dataSize + n > BFR_CAPACITY) {
@@ -84,6 +82,8 @@ void Radiotelescope::UsbWorker::process() {
             if (requestData.length() == 0) {
                 return;
             }
+
+            qDebug() << "sending " << requestData.length() << " bytes of data";
 
             serial->write(requestData);
 
