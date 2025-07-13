@@ -151,6 +151,17 @@ void MainWindow::setUsbWorker() {
         &Radiotelescope::UsbWorker::onChangeUsbPortName
     );
 
+    /*
+        Handle incoming data
+    */
+
+    QObject::connect(
+        usbWorker,
+        &Radiotelescope::UsbWorker::gotData,
+        eventHandler,
+        &Radiotelescope::EventHandler::onIncomingData
+    );
+
     usbWorker->moveToThread(usbThread);
 
     usbThread->start();

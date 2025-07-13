@@ -33,6 +33,7 @@ public slots:
 signals:
     void usbAvailable();
     void usbUnavailable();
+    void gotData(const QByteArray);
 
 private:
     QString usbPortName = "";

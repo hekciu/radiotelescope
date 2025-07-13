@@ -62,7 +62,7 @@ void Radiotelescope::UsbWorker::process() {
             success = serial->open(QIODevice::ReadWrite);
 
             if (success) {
-                // qInfo() << "successfully opened serial port";
+                qInfo() << "successfully opened serial port" << usbPortName;
                 emit usbAvailable();
             } else {
                 qWarning() << "could not open serial port: " << usbPortName;
@@ -70,6 +70,16 @@ void Radiotelescope::UsbWorker::process() {
             }
         }
 
+        // read data
+        if (success) {
+            QByteArray responseData = serial->readAll();
+
+            if (responseData.length() > 0) {
+                emit gotData(responseData);
+            }
+        }
+
+        // write data
         if (success) {
             m_mutex->lock();
 
@@ -90,17 +100,6 @@ void Radiotelescope::UsbWorker::process() {
             if (!serial->waitForBytesWritten(WAIT_TIMEOUT_MS)) {
                 success = false;
                 emit usbUnavailable();
-            } else {
-                /*
-                if (serial->waitForReadyRead(300)) {
-                    QByteArray responseData = serial->readAll();
-                        while (serial->waitForReadyRead(10)) {
-                            responseData += serial->readAll();
-                        }
-
-                        qDebug() << responseData;
-                }
-                */
             }
         }
 

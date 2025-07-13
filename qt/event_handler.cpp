@@ -47,6 +47,11 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 };
 
 
+void Radiotelescope::EventHandler::onIncomingData(const QByteArray data) {
+    qDebug() << "got data from usb device: " << QString::fromUtf8(data);
+};
+
+
 void Radiotelescope::EventHandler::onPortNameChanged(const QString newPortName) {
     lastPortName = portName;
     portName = newPortName;
