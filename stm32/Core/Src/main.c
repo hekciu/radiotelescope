@@ -36,6 +36,18 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define GPIO_TYPEDEF_M1 GPIOC
+#define GPIO_M1_0 GPIO_PIN_0
+#define GPIO_M1_1 GPIO_PIN_1
+#define GPIO_M1_2 GPIO_PIN_2
+#define GPIO_M1_3 GPIO_PIN_3
+
+#define GPIO_TYPEDEF_M2 GPIOA
+#define GPIO_M2_0 GPIO_PIN_3
+#define GPIO_M2_1 GPIO_PIN_4
+#define GPIO_M2_2 GPIO_PIN_5
+#define GPIO_M2_3 GPIO_PIN_6
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,23 +84,30 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void Motor_Full_Step_1(bool reverse) {
+static void Motor_Full_Step(
+		bool reverse,
+		GPIO_TypeDef * gpioTypedef,
+		uint16_t gpio0,
+		uint16_t gpio1,
+		uint16_t gpio2,
+		uint16_t gpio3
+) {
 	switch (cur_motor_step) {
 	case 0:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio1, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio2|gpio3, GPIO_PIN_RESET);
 		break;
 	case 1:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio1|gpio2, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio3, GPIO_PIN_RESET);
 		break;
 	case 2:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio2|gpio3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio1, GPIO_PIN_RESET);
 		break;
 	case 3:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio3, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(gpioTypedef, gpio1|gpio2, GPIO_PIN_RESET);
 		break;
 	}
 
@@ -104,51 +123,27 @@ static void Motor_Full_Step_1(bool reverse) {
 };
 
 
-static void Motor_Half_Step_1(bool reverse) {
-	switch (cur_motor_step) {
-	case 0:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-		break;
-	case 1:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
-		break;
-	case 2:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-		break;
-	case 3:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
-		break;
-	case 4:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-		break;
-	case 5:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
-		break;
-	case 6:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
-		break;
-	case 7:
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
-		break;
-	}
+static void Motor_Full_Step_1(bool reverse) {
+	Motor_Full_Step(
+		reverse,
+		GPIO_TYPEDEF_M1,
+		GPIO_M1_0,
+		GPIO_M1_1,
+		GPIO_M1_2,
+		GPIO_M1_3
+	);
+};
 
-	if (reverse) {
-		cur_motor_step--;
-	} else {
-		cur_motor_step++;
-	}
 
-	if (cur_motor_step > 7) cur_motor_step = 0;
-
-	if (cur_motor_step < 0) cur_motor_step = 7;
+static void Motor_Full_Step_2(bool reverse) {
+	Motor_Full_Step(
+		reverse,
+		GPIO_TYPEDEF_M2,
+		GPIO_M2_0,
+		GPIO_M2_1,
+		GPIO_M2_2,
+		GPIO_M2_3
+	);
 };
 
 
@@ -175,12 +170,14 @@ void Handle_Input_Command(uint8_t command) {
 
        case M2_RIGHT:
                CDC_Transmit_FS(m2_r_text, sizeof(m2_r_text));
-               // HAL_GPIO_TogglePin(GPIOB, 5);
+               Motor_Full_Step_2(true);
+               HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
        case M2_LEFT:
                CDC_Transmit_FS(m2_l_text, sizeof(m2_l_text));
-               // HAL_GPIO_TogglePin(GPIOB, 5);
+               Motor_Full_Step_2(true);
+               HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
        default:
@@ -365,12 +362,22 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
+
   /*Configure GPIO pins : PC0 PC1 PC2 PC3 */
   GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PA3 PA4 PA5 PA6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
