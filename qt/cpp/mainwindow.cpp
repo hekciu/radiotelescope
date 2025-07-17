@@ -170,7 +170,7 @@ void MainWindow::setUsbWorker() {
     QObject::connect(
         eventHandler,
         &Radiotelescope::EventHandler::updateChart,
-        [this](const Radiotelescope::AntennaMeasurement data) {
+        [this](const Radiotelescope::AntennaData data) {
             qDebug() << "updating chart with data" << data.timestamp << " " << data.value;
 
             ui->lineSeries->append(data.timestamp, data.value);

@@ -50,7 +50,12 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 
 
 void Radiotelescope::EventHandler::onIncomingData(const QByteArray data) {
-    // qDebug() << "got data from usb device: " << QString::fromUtf8(data);
+    if (data.length() > sizeof(Radiotelescope::AntennaData)) {
+        qWarning() << "packet parsing error, too few bytes";
+        return;
+    }
+
+    // decode :D
 
     emit updateChart({
         dupa_test * 2,

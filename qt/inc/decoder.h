@@ -4,24 +4,22 @@
 
 #include <cstdint>
 #include "QtCore/QString"
+#include "common_data.h"
 
 
 namespace Radiotelescope {
-    struct AntennaMeasurement;
     class Decoder;
+
+    typedef Rt_Antenna_Data AntennaData;
 };
 
 
-struct Radiotelescope::AntennaMeasurement {
-    uint32_t timestamp;
-    uint16_t value;
-};
 
 
 class Radiotelescope::Decoder {
 public:
     Decoder() = delete;
-    static AntennaMeasurement decode(const QString &);
+    static AntennaData decode(const QByteArray &);
 };
 
 #endif

@@ -41,7 +41,7 @@ public slots:
 signals:
     void sendData(const QString);
     void changeUsbPortName(const QString);
-    void updateChart(const Radiotelescope::AntennaMeasurement);
+    void updateChart(const Radiotelescope::AntennaData);
 
 private:
     bool usbWorkerAvailable = false;
