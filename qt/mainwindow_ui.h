@@ -14,6 +14,10 @@ Using .ui files was abandoned for this project.
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLineEdit>
 
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+
 #include "event_handler.h"
 
 QT_BEGIN_NAMESPACE
@@ -27,6 +31,9 @@ public:
     QPushButton * m2RButton;
     QLineEdit * portNameInput;
     QPushButton * savePortNameButton;
+    QLineSeries * lineSeries;
+    QChart * chart;
+    QChartView * chartView;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -50,14 +57,22 @@ public:
         portNameInput = new QLineEdit(MainWindow);
         portNameInput->setGeometry(200, 50, 100, 20);
 
-        savePortNameButton = new QPushButton("Save port\nname", MainWindow);
-        savePortNameButton->setGeometry(320, 40, 70, 40);
+        savePortNameButton = new QPushButton("Connect", MainWindow);
+        savePortNameButton->setGeometry(320, 50, 70, 20);
+
+        chart = new QChart();
+
+        chartView = new QChartView(chart, MainWindow);
+        chartView->setGeometry(20, 140, 600, 400);
+
+        lineSeries = new QLineSeries(chartView);
+
+        chart->addSeries(lineSeries);
+        chart->createDefaultAxes();
 
         // MainWindow->setCentralWidget(pushButton);
 
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Radio telescope control software", nullptr));
-
-        // QMetaObject::connectSlotsByName(MainWindow);
     }
 };
 

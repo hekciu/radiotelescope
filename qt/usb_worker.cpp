@@ -53,6 +53,11 @@ void Radiotelescope::UsbWorker::process() {
 
     timer = new QTimer();
     QThread::connect(timer, &QTimer::timeout, [this]() {
+        emit gotData("dupa");
+        return;
+
+        if (usbPortName.length() == 0) return;
+
         if (!success) {
             serial->close();
 

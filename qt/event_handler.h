@@ -1,6 +1,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+#include "decoder.h"
+
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
 
@@ -39,6 +41,7 @@ public slots:
 signals:
     void sendData(const QString);
     void changeUsbPortName(const QString);
+    void updateChart(const Radiotelescope::AntennaMeasurement);
 
 private:
     bool usbWorkerAvailable = false;

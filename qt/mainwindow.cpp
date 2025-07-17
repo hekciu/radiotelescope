@@ -1,6 +1,7 @@
 #include "mainwindow.h"
-#include "./mainwindow_ui.h"
+#include "mainwindow_ui.h"
 #include "usb_worker.h"
+#include "decoder.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
@@ -160,6 +161,24 @@ void MainWindow::setUsbWorker() {
         &Radiotelescope::UsbWorker::gotData,
         eventHandler,
         &Radiotelescope::EventHandler::onIncomingData
+    );
+
+    /*
+        Update chart
+    */
+
+    QObject::connect(
+        eventHandler,
+        &Radiotelescope::EventHandler::updateChart,
+        [this](const Radiotelescope::AntennaMeasurement data) {
+            qDebug() << "updating chart with data" << data.timestamp << " " << data.value;
+
+            ui->lineSeries->append(data.timestamp, data.value);
+            ui->chart->removeSeries(ui->lineSeries);
+            ui->chart->addSeries(ui->lineSeries);
+            ui->chart->createDefaultAxes();
+            ui->chartView->update(); 
+        }
     );
 
     usbWorker->moveToThread(usbThread);

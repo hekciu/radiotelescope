@@ -5,6 +5,8 @@
 
 QT_BEGIN_NAMESPACE
 
+static uint32_t dupa_test = 0;
+
 Radiotelescope::EventHandler::EventHandler(QObject * parent)
     : QObject(parent) {
 };
@@ -48,7 +50,14 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 
 
 void Radiotelescope::EventHandler::onIncomingData(const QByteArray data) {
-    qDebug() << "got data from usb device: " << QString::fromUtf8(data);
+    // qDebug() << "got data from usb device: " << QString::fromUtf8(data);
+
+    emit updateChart({
+        dupa_test * 2,
+        dupa_test
+    });
+
+    dupa_test++;
 };
 
 
