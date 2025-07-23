@@ -22,4 +22,4 @@ main: $(cpp_dir)/main.cpp $(inc_dir)/mainwindow_ui.h $(cpp_dir)/mainwindow.cpp $
 	-I $(inc_dir) \
 	-lQt6Widgets -lQt6Core -lQt6Gui -lQt6SerialPort -lQt6Charts \
 	-o radiotelescope
-	rm ./moc_*
+	rm -r build

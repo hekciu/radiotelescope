@@ -5,7 +5,6 @@
 
 QT_BEGIN_NAMESPACE
 
-static uint32_t dupa_test = 0;
 
 Radiotelescope::EventHandler::EventHandler(QObject * parent)
     : QObject(parent) {
@@ -49,20 +48,17 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 };
 
 
-void Radiotelescope::EventHandler::onIncomingData(const QByteArray data) {
-    if (data.length() > sizeof(Radiotelescope::AntennaData)) {
-        qWarning() << "packet parsing error, too few bytes";
-        return;
+void Radiotelescope::EventHandler::onIncomingData(QByteArray data) {
+    while (data.length() >= RT_ANTENNA_DATA_SIZE) {
+        auto dataPortion = data.last(RT_ANTENNA_DATA_SIZE);
+        data.remove(0, RT_ANTENNA_DATA_SIZE);
+
+        auto parsedData = Decoder::decode(dataPortion);
+
+        qDebug() << parsedData.timestamp << parsedData.value;
+
+        emit updateChart(parsedData);
     }
-
-    // decode :D
-
-    emit updateChart({
-        dupa_test * 2,
-        dupa_test
-    });
-
-    dupa_test++;
 };
 
 

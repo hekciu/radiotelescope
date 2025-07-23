@@ -36,7 +36,7 @@ public slots:
 
     void onPortNameChanged(const QString);
 
-    void onIncomingData(const QByteArray);
+    void onIncomingData(QByteArray);
 
 signals:
     void sendData(const QString);
