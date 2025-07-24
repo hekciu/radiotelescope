@@ -1,4 +1,5 @@
 #include "decoder.h"
+#include <QtCore/QDebug>
 
 
 Radiotelescope::AntennaData Radiotelescope::Decoder::decode(const QByteArray & data) {
@@ -8,13 +9,16 @@ Radiotelescope::AntennaData Radiotelescope::Decoder::decode(const QByteArray & d
 
     AntennaData output = {0, 0};
 
-    output.timestamp = (data.at(0) & 0xFF) << 24 +
-        (data.at(1) & 0xFF) << 16 +
-        (data.at(2) & 0xFF) << 8 +
-        (data.at(3) & 0xFF);
+    uint32_t byte0 = data.at(0);
+    uint32_t byte1 = data.at(1);
+    uint32_t byte2 = data.at(2);
+    uint32_t byte3 = data.at(3);
+    uint16_t byte4 = data.at(4);
+    uint16_t byte5 = data.at(5);
 
-    output.value = (data.at(4) & 0xFF) << 8 +
-        (data.at(5) & 0xFF);
+    output.timestamp = (byte0 << 24) + (byte1 << 16) + (byte2 << 8) + byte3;
+
+    output.value = (byte4 << 8) + byte5;
 
     return output;
 };

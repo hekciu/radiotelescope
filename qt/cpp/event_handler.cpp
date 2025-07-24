@@ -49,6 +49,8 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 
 
 void Radiotelescope::EventHandler::onIncomingData(QByteArray data) {
+    qDebug() << data.length();
+
     while (data.length() >= RT_ANTENNA_DATA_SIZE) {
         auto dataPortion = data.last(RT_ANTENNA_DATA_SIZE);
         data.remove(0, RT_ANTENNA_DATA_SIZE);
