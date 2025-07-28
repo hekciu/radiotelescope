@@ -27,12 +27,7 @@ void Radiotelescope::UsbWorker::sendData(const QString data) {
 
     m_mutex->lock();
 
-    if (m_dataSize + n > BFR_CAPACITY) {
-        // handle error
-    } else {
-        memcpy(m_bfr + m_dataSize, data.data(), n);
-        m_dataSize += n;
-    }
+    bufferArray.append(data.toLocal8Bit());
 
     m_mutex->unlock();
 }
@@ -85,9 +80,8 @@ void Radiotelescope::UsbWorker::process() {
         if (success) {
             m_mutex->lock();
 
-            QByteArray requestData(m_bfr, m_dataSize);
-
-            m_dataSize = 0;
+            QByteArray requestData(bufferArray);
+            bufferArray.clear(); // will this one make segfault?
 
             m_mutex->unlock();
 

@@ -37,11 +37,9 @@ signals:
 
 private:
     QString usbPortName = "";
-    static const uint32_t BFR_CAPACITY = 50000;
     static const uint32_t WAIT_TIMEOUT_MS = 30000;
     QMutex * m_mutex = nullptr;
-    uint32_t m_dataSize = 0;
-    char m_bfr[BFR_CAPACITY];
+    QByteArray bufferArray;
     bool success = false;
     QSerialPort * serial = nullptr;
     QTimer * timer = nullptr;
