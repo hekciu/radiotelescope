@@ -19,6 +19,16 @@ MainWindow::~MainWindow() {
 }
 
 
+void MainWindow::setPeriodSamples(const int & n) {
+    periodSamples = n;
+};
+
+
+int MainWindow::getPeriodSamples() {
+    return periodSamples;
+};
+
+
 void MainWindow::setUsbWorker() {
     qInfo() << "setting up";
 
@@ -170,18 +180,39 @@ void MainWindow::setUsbWorker() {
     QObject::connect(
         eventHandler,
         &Radiotelescope::EventHandler::updateChart,
-        [this](const Radiotelescope::AntennaData data) {
-            qDebug() << "updating chart with data" << data.timestamp << " " << data.value;
-
-            ui->lineSeries->append(data.timestamp, data.value);
-            ui->chart->removeSeries(ui->lineSeries);
-            ui->chart->addSeries(ui->lineSeries);
-            ui->chart->createDefaultAxes();
-            ui->chartView->update(); 
-        }
+        this,
+        &MainWindow::updateChart
     );
 
     usbWorker->moveToThread(usbThread);
 
     usbThread->start();
+}
+
+
+void MainWindow::updateChart(const Radiotelescope::AntennaData data) {
+    // qDebug() << "updating chart with data" << data.timestamp << " " << data.value;
+
+    lineSeriesBuffer.emplace_back(data);
+
+    if (lineSeriesBuffer.size() >= getPeriodSamples()) {
+        ui->lineSeries->clear();
+
+        // copy buffer to ui->lineSeries
+        for (const auto el : lineSeriesBuffer) {
+            ui->lineSeries->append(el.timestamp, el.value);
+        }
+
+        ui->chart->removeSeries(ui->lineSeries);
+        ui->chart->addSeries(ui->lineSeries);
+        ui->chart->createDefaultAxes();
+        ui->chartView->update();
+        lineSeriesBuffer.erase(lineSeriesBuffer.begin(), lineSeriesBuffer.end());
+    }
+
+
+    // remove elements overflow to create fixed number of samples
+    // use newly created seriesBuffer and only if it overflows
+    // periodSamples - update chart series
+
 }

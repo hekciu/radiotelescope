@@ -1,4 +1,5 @@
 #include "usb_worker.h"
+#include "decoder.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
@@ -38,6 +39,8 @@ void Radiotelescope::UsbWorker::onChangeUsbPortName(const QString portName) {
 };
 
 
+static uint16_t n = 0;
+
 void Radiotelescope::UsbWorker::process() {
     qInfo() << "starting processing usb commands";
 
@@ -47,7 +50,24 @@ void Radiotelescope::UsbWorker::process() {
     success = false;
 
     timer = new QTimer();
+
     QThread::connect(timer, &QTimer::timeout, [this]() {
+        uint32_t timestamp_test = n*2;
+
+        QByteArray test;
+        test.append(timestamp_test >> 24);
+        test.append(timestamp_test >> 16);
+        test.append(timestamp_test >> 8);
+        test.append(timestamp_test);
+        test.append(n >> 8);
+        test.append(n);
+
+        qDebug() << "n: " << n;
+
+        gotData(test);
+        n++;
+        return;
+
         if (usbPortName.length() == 0) return;
 
         if (!success) {
@@ -101,5 +121,5 @@ void Radiotelescope::UsbWorker::process() {
 
     });
 
-    timer->start(100);
+    timer->start(200);
 };

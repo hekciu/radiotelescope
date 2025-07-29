@@ -20,5 +20,7 @@ Radiotelescope::AntennaData Radiotelescope::Decoder::decode(const QByteArray & d
 
     output.value = (byte4 << 8) + byte5;
 
+    qDebug() << "decoded to: " << output.timestamp << output.value;
+
     return output;
 };

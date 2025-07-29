@@ -51,11 +51,11 @@ void Radiotelescope::EventHandler::onMotorButtonReleased() {
 void Radiotelescope::EventHandler::onIncomingData(QByteArray data) {
     while (data.length() >= RT_ANTENNA_DATA_SIZE) {
         auto dataPortion = data.last(RT_ANTENNA_DATA_SIZE);
+        qDebug() << "1" << data.length();
         data.remove(0, RT_ANTENNA_DATA_SIZE);
+        qDebug() << "2" << data.length();
 
         auto parsedData = Decoder::decode(dataPortion);
-
-        qDebug() << parsedData.timestamp << parsedData.value;
 
         emit updateChart(parsedData);
     }

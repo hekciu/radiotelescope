@@ -1,5 +1,8 @@
+#include <vector>
+
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QThread>
+#include <QtCharts/QLineSeries>
 
 #include "usb_worker.h"
 #include "event_handler.h"
@@ -17,6 +20,8 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget * parent = nullptr);
     ~MainWindow();
+    void setPeriodSamples(const int &);
+    int getPeriodSamples();
 
 signals:
     void portNameChanged(const QString portName);
@@ -27,4 +32,9 @@ private:
     QThread * usbThread;
     Radiotelescope::UsbWorker * usbWorker;
     Radiotelescope::EventHandler * eventHandler;
+    void updateChart(const Radiotelescope::AntennaData);
+
+    int periodSamples = 10;
+    std::vector<Radiotelescope::AntennaData> lineSeriesBuffer;
 };
+
