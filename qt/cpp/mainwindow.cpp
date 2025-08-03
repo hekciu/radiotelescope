@@ -20,6 +20,8 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::setPeriodSamples(const int & n) {
+    qDebug() << "setting period samples to: " << n;
+
     periodSamples = n;
 };
 
@@ -160,6 +162,21 @@ void MainWindow::setUsbWorker() {
         &Radiotelescope::EventHandler::changeUsbPortName,
         usbWorker,
         &Radiotelescope::UsbWorker::onChangeUsbPortName
+    );
+
+    /*
+        Period samples
+    */
+
+    QObject::connect(
+        ui->saveSamplesPeriodButton,
+        &QPushButton::clicked,
+        [this]() {
+            const QString periodSamplesStr = ui->samplesPeriodInput->text();
+
+            const int periodSamples = periodSamplesStr.toInt();
+            setPeriodSamples(periodSamples);
+        }
     );
 
     /*

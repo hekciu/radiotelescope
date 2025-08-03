@@ -13,6 +13,7 @@ Using .ui files was abandoned for this project.
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLineEdit>
+#include <QtGui/QIntValidator>
 
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
@@ -29,8 +30,13 @@ public:
     QPushButton * m1RButton;
     QPushButton * m2LButton;
     QPushButton * m2RButton;
+
     QLineEdit * portNameInput;
     QPushButton * savePortNameButton;
+
+    QLineEdit * samplesPeriodInput;
+    QPushButton * saveSamplesPeriodButton;
+
     QLineSeries * lineSeries;
     QChart * chart;
     QChartView * chartView;
@@ -54,11 +60,20 @@ public:
         m2RButton = new QPushButton("m2r", MainWindow);
         m2RButton->setGeometry(60, 70, 60, 20);
 
+        // port name input
         portNameInput = new QLineEdit(MainWindow);
         portNameInput->setGeometry(200, 50, 100, 20);
 
         savePortNameButton = new QPushButton("Connect", MainWindow);
         savePortNameButton->setGeometry(320, 50, 70, 20);
+
+        // samples period input
+        samplesPeriodInput = new QLineEdit(MainWindow);
+        samplesPeriodInput->setGeometry(420, 50, 100, 20);
+        samplesPeriodInput->setValidator(new QIntValidator(0, 100000, MainWindow));
+
+        saveSamplesPeriodButton = new QPushButton("Save samples number", MainWindow);
+        saveSamplesPeriodButton->setGeometry(540, 50, 110, 20);
 
         chart = new QChart();
 
