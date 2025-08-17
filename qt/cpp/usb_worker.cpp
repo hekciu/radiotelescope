@@ -55,12 +55,12 @@ void Radiotelescope::UsbWorker::process() {
         uint32_t timestamp_test = n*2;
 
         QByteArray test;
-        test.append(timestamp_test >> 24);
-        test.append(timestamp_test >> 16);
-        test.append(timestamp_test >> 8);
-        test.append(timestamp_test);
-        test.append(n >> 8);
-        test.append(n);
+        test.append((timestamp_test >> 24) & 0xFF);
+        test.append((timestamp_test >> 16) & 0xFF);
+        test.append((timestamp_test >> 8) & 0xFF);
+        test.append(timestamp_test & 0xFF);
+        test.append((n >> 8) & 0xFF);
+        test.append(n & 0xFF);
 
         qDebug() << "n: " << n;
 
