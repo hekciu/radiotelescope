@@ -27,6 +27,25 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/*
+ 	 These function implementations depend on selected driver
+*/
+
+static void Motor_Step_1(bool reverse);
+static void Motor_Step_2(bool reverse);
+
+// #define A4988
+#define DRV2003
+
+
+#ifdef DRV2003
+#include "drv2003_driver.h"
+#endif
+
+#ifdef A4988
+#include "a4988_driver.h"
+#endif
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,18 +55,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define GPIO_TYPEDEF_M1 GPIOC
-#define GPIO_M1_0 GPIO_PIN_0
-#define GPIO_M1_1 GPIO_PIN_1
-#define GPIO_M1_2 GPIO_PIN_2
-#define GPIO_M1_3 GPIO_PIN_3
-
-#define GPIO_TYPEDEF_M2 GPIOA
-#define GPIO_M2_0 GPIO_PIN_3
-#define GPIO_M2_1 GPIO_PIN_4
-#define GPIO_M2_2 GPIO_PIN_5
-#define GPIO_M2_3 GPIO_PIN_6
 
 /* USER CODE END PD */
 
@@ -62,7 +69,6 @@ ADC_HandleTypeDef hadc1;
 /* USER CODE BEGIN PV */
 
 uint32_t value_adc;
-static int8_t cur_motor_step = 8;
 
 enum COMMAND {
    M1_RIGHT = 97,
@@ -85,68 +91,6 @@ static void MX_ADC1_Init(void);
 /* USER CODE BEGIN 0 */
 
 
-static void Motor_Full_Step(
-		bool reverse,
-		GPIO_TypeDef * gpioTypedef,
-		uint16_t gpio0,
-		uint16_t gpio1,
-		uint16_t gpio2,
-		uint16_t gpio3
-) {
-	switch (cur_motor_step) {
-	case 0:
-		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio1, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(gpioTypedef, gpio2|gpio3, GPIO_PIN_RESET);
-		break;
-	case 1:
-		  HAL_GPIO_WritePin(gpioTypedef, gpio1|gpio2, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio3, GPIO_PIN_RESET);
-		break;
-	case 2:
-		  HAL_GPIO_WritePin(gpioTypedef, gpio2|gpio3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio1, GPIO_PIN_RESET);
-		break;
-	case 3:
-		  HAL_GPIO_WritePin(gpioTypedef, gpio0|gpio3, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(gpioTypedef, gpio1|gpio2, GPIO_PIN_RESET);
-		break;
-	}
-
-	if (reverse) {
-		cur_motor_step--;
-	} else {
-		cur_motor_step++;
-	}
-
-	if (cur_motor_step > 3) cur_motor_step = 0;
-
-	if (cur_motor_step < 0) cur_motor_step = 3;
-};
-
-
-static void Motor_Full_Step_1(bool reverse) {
-	Motor_Full_Step(
-		reverse,
-		GPIO_TYPEDEF_M1,
-		GPIO_M1_0,
-		GPIO_M1_1,
-		GPIO_M1_2,
-		GPIO_M1_3
-	);
-};
-
-
-static void Motor_Full_Step_2(bool reverse) {
-	Motor_Full_Step(
-		reverse,
-		GPIO_TYPEDEF_M2,
-		GPIO_M2_0,
-		GPIO_M2_1,
-		GPIO_M2_2,
-		GPIO_M2_3
-	);
-};
-
 
 void Handle_Input_Command(uint8_t command) {
        uint8_t m1_r_text[] = "motor 1 step right\n";
@@ -159,25 +103,25 @@ void Handle_Input_Command(uint8_t command) {
        switch(command) {
        case M1_RIGHT:
                CDC_Transmit_FS(m1_r_text, sizeof(m1_r_text));
-               Motor_Full_Step_1(false);
+               Motor_Step_1(false);
                HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
        case M1_LEFT:
                CDC_Transmit_FS(m1_l_text, sizeof(m1_l_text));
-               Motor_Full_Step_1(true);
+               Motor_Step_1(true);
                HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
        case M2_RIGHT:
                CDC_Transmit_FS(m2_r_text, sizeof(m2_r_text));
-               Motor_Full_Step_2(true);
+               Motor_Step_2(true);
                HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
        case M2_LEFT:
                CDC_Transmit_FS(m2_l_text, sizeof(m2_l_text));
-               Motor_Full_Step_2(true);
+               Motor_Step_2(true);
                HAL_GPIO_TogglePin(GPIOB, 5);
                break;
 
