@@ -17,8 +17,9 @@
 #define GPIO_M2_STEP GPIO_PIN_3
 
 // https://www.pololu.com/file/0J450/A4988.pdf
-#define STEP_HIGH_DURATION_MS 2
+// https://www.pololu.com/product/1182
 
+#define STEP_HIGH_DURATION_MS 5
 
 static void Motor_Full_Step(
 	bool reverse,
@@ -33,6 +34,7 @@ static void Motor_Full_Step(
 	}
 
 	HAL_GPIO_WritePin(gpioTypedef, gpioStep, GPIO_PIN_SET);
+
 
 	HAL_Delay(STEP_HIGH_DURATION_MS);
 
@@ -58,7 +60,6 @@ static void Motor_Step_2(bool reverse) {
 	);
 };
 
-// https://www.pololu.com/product/1182
 
 
 

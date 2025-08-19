@@ -71,11 +71,14 @@ ADC_HandleTypeDef hadc1;
 uint32_t value_adc;
 
 enum COMMAND {
+	NONE = 0,
    M1_RIGHT = 97,
    M1_LEFT = 98,
    M2_RIGHT = 99,
    M2_LEFT = 100
 };
+
+static enum COMMAND next_command = NONE;
 
 /* USER CODE END PV */
 
@@ -93,42 +96,7 @@ static void MX_ADC1_Init(void);
 
 
 void Handle_Input_Command(uint8_t command) {
-       uint8_t m1_r_text[] = "motor 1 step right\n";
-       uint8_t m1_l_text[] = "motor 1 step left\n";
-       uint8_t m2_r_text[] = "motor 2 step right\n";
-       uint8_t m2_l_text[] = "motor 2 step left\n";
-
-       uint8_t unknown_command_text[] = "unknown command\n";
-
-       switch(command) {
-       case M1_RIGHT:
-               CDC_Transmit_FS(m1_r_text, sizeof(m1_r_text));
-               Motor_Step_1(false);
-               HAL_GPIO_TogglePin(GPIOB, 5);
-               break;
-
-       case M1_LEFT:
-               CDC_Transmit_FS(m1_l_text, sizeof(m1_l_text));
-               Motor_Step_1(true);
-               HAL_GPIO_TogglePin(GPIOB, 5);
-               break;
-
-       case M2_RIGHT:
-               CDC_Transmit_FS(m2_r_text, sizeof(m2_r_text));
-               Motor_Step_2(true);
-               HAL_GPIO_TogglePin(GPIOB, 5);
-               break;
-
-       case M2_LEFT:
-               CDC_Transmit_FS(m2_l_text, sizeof(m2_l_text));
-               Motor_Step_2(true);
-               HAL_GPIO_TogglePin(GPIOB, 5);
-               break;
-
-       default:
-               CDC_Transmit_FS(unknown_command_text, sizeof(unknown_command_text));
-               break;
-       }
+       next_command = command;
 }
 
 
@@ -173,8 +141,48 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  /*
 	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	  HAL_Delay(1000);
+	  */
+       uint8_t m1_r_text[] = "motor 1 step right\n";
+       uint8_t m1_l_text[] = "motor 1 step left\n";
+       uint8_t m2_r_text[] = "motor 2 step right\n";
+       uint8_t m2_l_text[] = "motor 2 step left\n";
+
+       uint8_t unknown_command_text[] = "unknown command\n";
+
+       switch(next_command) {
+       case M1_RIGHT:
+               Motor_Step_1(false);
+               CDC_Transmit_FS(m1_r_text, sizeof(m1_r_text));
+               HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+               break;
+
+       case M1_LEFT:
+               Motor_Step_1(true);
+               CDC_Transmit_FS(m1_l_text, sizeof(m1_l_text));
+               HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+               break;
+
+       case M2_RIGHT:
+               Motor_Step_2(false);
+               CDC_Transmit_FS(m2_r_text, sizeof(m2_r_text));
+               HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+               break;
+
+       case M2_LEFT:
+               Motor_Step_2(true);
+               CDC_Transmit_FS(m2_l_text, sizeof(m2_l_text));
+               HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+               break;
+
+       default:
+               break;
+       }
+
+       next_command = NONE;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
