@@ -34,8 +34,8 @@
 static void Motor_Step_1(bool reverse);
 static void Motor_Step_2(bool reverse);
 
-// #define A4988
-#define DRV2003
+#define A4988
+// #define DRV2003
 
 
 #ifdef DRV2003
