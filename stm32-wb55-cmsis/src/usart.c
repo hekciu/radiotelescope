@@ -1,12 +1,11 @@
-#include "usart.h"
-
 #include <stdint.h>
 
 #define STM32WB55xx
 
 #include "stm32wbxx.h"
 
-#define BIT(i) (1UL << (i))
+#include "usart.h"
+#include "common.h"
 
 
 void usart_init(uint32_t baud) {
@@ -37,10 +36,24 @@ void usart_init(uint32_t baud) {
 
     USART1->CR1 = 0;
 
-    USART1->CR1 |= BIT(2) | BIT(5);
+    USART1->CR1 |= BIT(2) | BIT(3) | BIT(5);
 
     uint32_t usartdiv = 4000000 / baud;
     USART1->BRR = usartdiv;
 
     USART1->CR1 |= BIT(0);
+}
+
+
+static void usart_transmit_char(char c) {
+    USART1->TDR = (uint32_t)c;
+
+    while (!IS_FLAG_SET(USART1->ISR, 7)) {};
+}
+
+
+void usart_transmit(const char* buffer) {
+    for (;*buffer != '\0';buffer++) {
+        usart_transmit_char(*buffer);
+    }
 }

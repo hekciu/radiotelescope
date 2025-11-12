@@ -4,6 +4,7 @@ HEADERS_INCLUDE=include
 
 SRC_DIR=src
 
+#TODO: add headers to dependencies
 
 main.o: main.c
 	arm-none-eabi-gcc -I${CMSIS_CORE_INCLUDE} -I${CMSIS_WB_INCLUDE} -I${HEADERS_INCLUDE} -mcpu=cortex-m4 main.c -c -o main.o
@@ -11,8 +12,11 @@ main.o: main.c
 usart.o: ${SRC_DIR}/usart.c
 	arm-none-eabi-gcc -I${CMSIS_CORE_INCLUDE} -I${CMSIS_WB_INCLUDE} -I${HEADERS_INCLUDE} -mcpu=cortex-m4 ${SRC_DIR}/usart.c -c -o usart.o
 
-firmware.elf: main.o usart.o
-	arm-none-eabi-gcc -T link.ld -nostdlib main.o usart.o -o firmware.elf
+led.o: ${SRC_DIR}/led.c
+	arm-none-eabi-gcc -I${CMSIS_CORE_INCLUDE} -I${CMSIS_WB_INCLUDE} -I${HEADERS_INCLUDE} -mcpu=cortex-m4 ${SRC_DIR}/led.c -c -o led.o
+
+firmware.elf: main.o usart.o led.o
+	arm-none-eabi-gcc -T link.ld -nostdlib main.o usart.o led.o -o firmware.elf
 
 firmware.bin: firmware.elf
 	arm-none-eabi-objcopy -O binary firmware.elf firmware.bin
